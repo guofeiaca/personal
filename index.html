@@ -187,6 +187,7 @@
 		
 		
            <div id="CounterVisitor">
+		   Visit: 
            </div>
 
            <script>
@@ -200,7 +201,7 @@
            localStorage.setItem("on_load_counter", n);
 
            nums = n.toString().split('').map(Number);
-           document.getElementById('CounterVisitor').innerHTML = Visit: '';
+           document.getElementById('CounterVisitor').innerHTML = '';
            for (var i of nums) {
              document.getElementById('CounterVisitor').innerHTML += '<span class="counter-item">' + i + '</span>';
            }
