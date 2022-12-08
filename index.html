@@ -94,7 +94,33 @@
               <dd><a href="https://scholar.google.com/citations?user=8e3derMAAAAJ&hl=en&oi=sra">Google Scholar</a></dd> 
               <dd><a href="https://www.researchgate.net/profile/Fei-Guo-55">ResearchGate</a></dd>
 	      <dd><a href="https://em.nxu.edu.cn/info/1279/6995.htm">Institute Page</a></dd>
-                </div>
+            
+		
+	      <span> Visit: </span>   
+              <span id="CounterVisitor" >
+              </span>
+
+	      <script>
+              var n = localStorage.getItem('on_load_counter');
+   
+              if (n === null) {
+                               n = 0;
+                               }
+              n++;
+
+              localStorage.setItem("on_load_counter", n);
+
+              nums = n.toString().split('').map(Number);
+              document.getElementById('CounterVisitor').innerHTML = '';
+              for (var i of nums) {
+              document.getElementById('CounterVisitor').innerHTML += '<span class="counter-item">' + i + '</span>';
+              }
+
+              </script>
+			
+			
+			
+	      </div>
             </div>
             
             
@@ -184,31 +210,7 @@
             </div>
 		
 
-		
-		
-           <div id="CounterVisitor">
-		   Visit: 
-           </div>
 
-           <script>
-           var n = localStorage.getItem('on_load_counter');
-
-           if (n === null) {
-                            n = 0;
-                            }
-           n++;
-
-           localStorage.setItem("on_load_counter", n);
-
-           nums = n.toString().split('').map(Number);
-           document.getElementById('CounterVisitor').innerHTML = '';
-           for (var i of nums) {
-             document.getElementById('CounterVisitor').innerHTML += '<span class="counter-item">' + i + '</span>';
-           }
-
-           </script>
-		
-		
 		
         </div>
 
