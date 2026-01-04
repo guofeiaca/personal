@@ -21,35 +21,41 @@
 
 
 <!-- Navigation -->
-	<nav class="navbar navbar-inverse navbar-static-top" role="navigation">
-	  <div class="container">
-		<div class="navbar-header">
-		  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-						<span class="sr-only">Toggle navigation</span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-			  			<span class="icon-bar"></span>
-			                        <span class="icon-bar"></span> 
-			  
-					</button>
-		</div>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">  <!-- 或 navbar-static-top 改成无 fixed-top -->
+  <div class="container">
+    <!-- Brand/Logo（如果你有 logo 可以加在这里） -->
+    <a class="navbar-brand" href="#">Your Name</a>  <!-- 可替换成你的名字或 logo -->
 
-		<!-- Collect the nav links, forms, and other content for toggling -->
-		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style= "font-size: 24px;">
-		 <div style="font-family: 'Times New Roman', sans-serif;">
-		  <ul class="nav navbar-nav">
-				  <li id="begining"><a href="#begining2">Home</a></li>
-				  <li id="begining2"><a href="#Grant">Grant</a></li>
-				  <li><a href="#Publications">Publications</a></li>
-			          <li><a href="#Working Papers">Working Papers</a></li> 
-			          <li><a href="https://guofeiaca.github.io/personal/CV20_2025Jan9.pdf">CV</a></li> 
-			          <li><a href="#Teaching">Teaching</a></li> 
-		  </ul>
-		</div>
-	     </div>
-	  </div>
-	</nav>
+    <!-- 手机端汉堡按钮 -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- 菜单内容 -->
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav ms-auto" style="font-size: 24px; font-family: 'Times New Roman', Times, serif;">
+        <li class="nav-item">
+          <a class="nav-link" href="#begining2">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#Grant">Grant</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#Publications">Publications</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#Working Papers">Working Papers</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://guofeiaca.github.io/personal/CV20_2025Jan9.pdf">CV</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#Teaching">Teaching</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
 
 
