@@ -404,22 +404,37 @@ window.addEventListener('load', function() {
     const likeButton = document.getElementById('likeButton');
     const heart = document.getElementById('heart');
     const likeCount = document.getElementById('myLikeCount');
-    if (!likeButton || !heart || !likeCount) return;
+    if (!likeButton || !heart || !likeCount) {
+      console.error('点赞元素未找到');
+      return;
+    }
 
     const pageKey = 'my_portfolio_likes_2026';
-    const initialLikes = 142; // 真实初始全局点赞数（你手动设置）
+    const initialLikes = 142; // 你真实的初始点赞数
 
-    // 从 localStorage 读取
+    // 从 localStorage 读取状态
     let displayedLikes = parseInt(localStorage.getItem(pageKey + '_displayed')) || initialLikes;
-    let hasContributed = localStorage.getItem(pageKey + '_contributed') === 'true'; // 是否已贡献过+1
+    
+    // 是否已经永久贡献过 +1（今天或以前）
+    let hasContributed = localStorage.getItem(pageKey + '_contributed') === 'true';
+    
+    // 上次真正贡献 +1 的时间戳
     let lastContributeTime = parseInt(localStorage.getItem(pageKey + '_lastTime')) || 0;
-    let isTempLiked = localStorage.getItem(pageKey + '_tempLiked') === 'true'; // 当前视觉是否点红
+    
+    // 当前视觉是否为已点赞状态（红心）
+    let isTempLiked = localStorage.getItem(pageKey + '_tempLiked') === 'true';
 
     const oneDayInMs = 24 * 60 * 60 * 1000;
     const now = Date.now();
 
-    // 是否可以今天真正贡献+1
-    const canContributeToday = !hasContributed || (now - lastContributeTime) >= oneDayInMs;
+    // 判断今天是否还能真正贡献一次 +1
+    let canContributeToday = !hasContributed || (now - lastContributeTime) >= oneDayInMs;
+
+    // 如果跨天了，重置今天的机会
+    if (!canContributeToday && (now - lastContributeTime) >= oneDayInMs) {
+      canContributeToday = true;
+      hasContributed = false; // 新的一天，重置贡献标记
+    }
 
     function updateDisplay() {
       likeCount.textContent = displayedLikes;
@@ -432,40 +447,44 @@ window.addEventListener('load', function() {
       }
     }
 
+    // 初始显示
     updateDisplay();
 
     likeButton.onclick = function(e) {
       e.stopPropagation();
 
-      // 如果当前是未点赞状态 → 尝试点赞
       if (!isTempLiked) {
+        // ===== 正在点赞（从 ♡ → ♥）=====
         isTempLiked = true;
 
-        // 如果今天还能贡献真实点赞 → 总数+1
+        // 只有今天还能贡献时，才真正增加数字
         if (canContributeToday) {
           displayedLikes++;
           hasContributed = true;
+          lastContributeTime = now;
           localStorage.setItem(pageKey + '_lastTime', now);
           localStorage.setItem(pageKey + '_contributed', 'true');
         }
-        // 否则只是视觉点赞（临时，取消时会回滚）
-      } 
-      // 如果当前是已点赞状态 → 取消点赞
-      else {
+        // 否则只是视觉点赞，不加数字
+
+      } else {
+        // ===== 正在取消点赞（从 ♥ → ♡）=====
         isTempLiked = false;
 
-        // 只有是“今天刚贡献的临时点赞”才回滚数字，否则不减（防止减少真实总数）
+        // 只有是“今天刚贡献的”临时点赞，才允许回滚数字
         if (canContributeToday && hasContributed && (now - lastContributeTime) < oneDayInMs) {
-          displayedLikes--; // 回滚今天的临时+1
-          // 不重置 hasContributed，因为今天已经用掉机会了
+          displayedLikes--;
+          // 注意：机会已经用过，不重置 hasContributed 和时间
         }
-        // 如果是昨天或更早贡献的，取消也不减（因为那已经是“永久”+1）
+        // 如果是以前贡献的，取消也不减数字（保护总数不下降）
       }
 
-      // 保存状态
+      // 保存所有状态
       localStorage.setItem(pageKey + '_displayed', displayedLikes);
       localStorage.setItem(pageKey + '_tempLiked', isTempLiked);
+      // hasContributed 和 lastTime 只在真正+1时更新，已在上方处理
 
+      // 更新显示
       updateDisplay();
     };
 
