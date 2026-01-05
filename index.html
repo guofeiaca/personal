@@ -22,14 +22,16 @@
 
   <style>
     /* ================ 点赞功能专属样式 ================ */
-    .like-sidebar {
-      text-align: center;
-      margin-top: 40px;
-      padding: 25px 15px;
-      background: linear-gradient(135deg, #f0f2f5 0%, #e0e6ed 100%);
-      border-radius: 16px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    }
+.like-sidebar {
+  text-align: center;
+  margin: 40px auto 0;          /* 上间距40px，左右自动居中 */
+  padding: 20px 15px;           /* 内边距缩小一点，更紧凑 */
+  max-width: 100%;              /* 关键：不超过 col-md-4 的宽度 */
+  width: fit-content;           /* 关键：背景宽度自适应内容，不拉伸到100% */
+  background: linear-gradient(135deg, #f0f2f5 0%, #e0e6ed 100%);
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
     .like-tip {
       margin-bottom: 18px;
       color: #555;
