@@ -398,7 +398,6 @@
 				
 
 
-<!-- 最终优化版点赞脚本 -->
 <script>
 window.addEventListener('load', function() {
   setTimeout(function() {
@@ -411,18 +410,27 @@ window.addEventListener('load', function() {
     }
 
     const pageKey = 'my_portfolio_likes_2026';
-    const initialLikes = 142; // 你的真实初始值，改这里即可
+    const initialLikes = 142; // 你的初始点赞数
 
-    // 从 localStorage 读取状态
+    // 读取状态
     let displayedLikes = parseInt(localStorage.getItem(pageKey + '_count')) || initialLikes;
-    let lastAddTime = parseInt(localStorage.getItem(pageKey + '_lastAdd')) || 0; // 上次真正+1的时间
-    let isCurrentlyLiked = localStorage.getItem(pageKey + '_status') === 'true'; // 当前是否红心
+    
+    // 上次真正+1的时间（用于判断今天是否已加过）
+    let lastAddTime = parseInt(localStorage.getItem(pageKey + '_lastAdd')) || 0;
+    
+    // 当前是否为红心状态
+    let isCurrentlyLiked = localStorage.getItem(pageKey + '_status') === 'true';
+    
+    // 今天是否已经真正贡献过+1（并且尚未回滚）
+    let hasAddedTodayAndNotRolledBack = localStorage.getItem(pageKey + '_hasAddedToday') === 'true';
 
     const oneDayInMs = 24 * 60 * 60 * 1000;
     const now = Date.now();
 
-    // 判断今天是否已经真正+1过
-    const hasAddedToday = lastAddTime > 0 && (now - lastAddTime) < oneDayInMs;
+    // 重新计算：如果上次+1已超过24小时，则重置今天状态
+    if (lastAddTime > 0 && (now - lastAddTime) >= oneDayInMs) {
+      hasAddedTodayAndNotRolledBack = false;
+    }
 
     // 更新显示
     function updateDisplay() {
@@ -435,8 +443,6 @@ window.addEventListener('load', function() {
         heart.classList.remove('liked');
       }
     }
-
-    // 初始显示
     updateDisplay();
 
     // 点击事件
@@ -447,29 +453,33 @@ window.addEventListener('load', function() {
         // ========= 正在点赞（♡ → ♥）=========
         isCurrentlyLiked = true;
 
-        // 只有今天还没真正+1过，才增加数字
-        if (!hasAddedToday) {
+        // 只有今天还没真正加过，才+1 并标记
+        if (!hasAddedTodayAndNotRolledBack) {
           displayedLikes++;
           lastAddTime = now;
+          hasAddedTodayAndNotRolledBack = true;
           localStorage.setItem(pageKey + '_lastAdd', now);
+          localStorage.setItem(pageKey + '_hasAddedToday', 'true');
         }
-        // 否则只变红心，不加数字（今天机会已用完）
+        // 否则只是变红心，不加数字
 
       } else {
         // ========= 正在取消点赞（♥ → ♡）=========
         isCurrentlyLiked = false;
 
-        // 只有是“今天刚加的”这个+1，才允许回滚减1
-        if (hasAddedToday) {
+        // 只有今天真正加过且尚未回滚过，才允许回滚-1
+        if (hasAddedTodayAndNotRolledBack) {
           displayedLikes--;
-          // 注意：不清除 lastAddTime，这样今天就不能再加了
+          hasAddedTodayAndNotRolledBack = false; // 回滚后标记为已回滚，今天不能再减
+          // 注意：不清除 lastAddTime，防止今天再加
         }
-        // 如果是以前加的永久点赞，取消也不减数字
+        // 其他情况一律不减（包括反复取消）
       }
 
-      // 保存最新状态
+      // 保存状态
       localStorage.setItem(pageKey + '_count', displayedLikes);
       localStorage.setItem(pageKey + '_status', isCurrentlyLiked);
+      localStorage.setItem(pageKey + '_hasAddedToday', hasAddedTodayAndNotRolledBack);
 
       updateDisplay();
     };
