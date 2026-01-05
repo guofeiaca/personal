@@ -19,7 +19,82 @@
 
 
 
+
+  <style>
+    /* ================ 点赞功能专属样式 ================ */
+    .like-sidebar {
+      text-align: center;
+      margin-top: 40px;
+      padding: 25px 15px;
+      background: linear-gradient(135deg, #f0f2f5 0%, #e0e6ed 100%);
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+    .like-tip {
+      margin-bottom: 18px;
+      color: #555;
+      font-size: 15px;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+    .like-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 28px;
+      background: #ffffff;
+      border-radius: 50px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.4s ease;
+    }
+    .like-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+    .heart {
+      font-size: 34px;
+      color: #ccc;
+      transition: all 0.4s ease;
+    }
+    .heart.liked {
+      color: #e74c3c;
+      animation: pulse 0.6s ease;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4); }
+      100% { transform: scale(1); }
+    }
+    .count {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    /* ================ 样式结束 ================ */
+  </style>
+
+
+
+
+
+	
+
 </head>
+
+
+
+
+
+
+
+
+
+
+
+
+	
 <body>
 
 
@@ -265,15 +340,15 @@
 
 
 			  
-<!-- ================ 新增：点赞功能（放在侧边栏底部） ================ -->
-  <div class="like-sidebar">
-    <p class="like-tip">喜欢我的简历吗？<br>点个赞鼓励一下吧～</p>
-    <div class="like-btn" id="likeButton">
-      <span class="heart" id="heart">♡</span>
-      <span class="count" id="likeCount">0</span>
-    </div>
-  </div>
-  <!-- ================ 点赞结束 ================ -->
+      <!-- ================ 点赞功能开始 ================ -->
+      <div class="like-sidebar">
+        <p class="like-tip">喜欢我的简历吗？<br>点个赞鼓励一下吧～</p>
+        <div class="like-btn" id="likeButton">
+          <span class="heart" id="heart">♡</span>
+          <span class="count" id="likeCount">142</span>
+        </div>
+      </div>
+      <!-- ================ 点赞功能结束 ================ -->
 
 
 			  
@@ -298,8 +373,66 @@
 	</div>
   </div>     
 
+
+
+
+
+
+
+				
 <!-- 不蒜子计数器脚本 -->
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script>
+  // ================ 点赞功能脚本（一定能点击） ================
+  document.addEventListener('DOMContentLoaded', function() {
+    const likeButton = document.getElementById('likeButton');
+    const heart = document.getElementById('heart');
+    const likeCount = document.getElementById('likeCount');
+
+    const pageKey = 'my_portfolio_likes_2026';
+
+    let totalLikes = parseInt(localStorage.getItem(pageKey + '_total')) || 142;
+    let isLiked = localStorage.getItem(pageKey + '_liked') === 'true';
+
+    function updateDisplay() {
+      likeCount.textContent = totalLikes;
+      if (isLiked) {
+        heart.textContent = '♥';
+        heart.classList.add('liked');
+      } else {
+        heart.textContent = '♡';
+        heart.classList.remove('liked');
+      }
+    }
+
+    updateDisplay();
+
+    likeButton.addEventListener('click', function() {
+      if (isLiked) {
+        totalLikes--;
+        isLiked = false;
+      } else {
+        totalLikes++;
+        isLiked = true;
+      }
+      localStorage.setItem(pageKey + '_total', totalLikes);
+      localStorage.setItem(pageKey + '_liked', isLiked);
+      updateDisplay();
+    });
+  });
+  </script>
+
+
+
+
+
+
 				
 </body>
 
