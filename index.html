@@ -340,15 +340,15 @@
 
 
 			  
-      <!-- ================ 点赞功能开始 ================ -->
-      <div class="like-sidebar">
-        <p class="like-tip">Click the heart to like it! ❤️</p>
-        <div class="like-btn" id="likeButton">
-          <span class="heart" id="heart">♡</span>
-          <span class="count" id="likeCount">142</span>
-        </div>
-      </div>
-      <!-- ================ 点赞功能结束 ================ -->
+<!-- ================ 点赞功能开始 ================ -->
+<div class="like-sidebar">
+  <p class="like-tip">Click the heart to like it! ❤️</p>
+  <div class="like-btn" id="likeButton">
+    <span class="heart" id="heart">♡</span>
+    <span class="count" id="myLikeCount">142</span>  <!-- 这里改了！ -->
+  </div>
+</div>
+<!-- ================ 点赞功能结束 ================ -->
 
 
 			  
@@ -393,7 +393,7 @@
   document.addEventListener('DOMContentLoaded', function() {
     const likeButton = document.getElementById('likeButton');
     const heart = document.getElementById('heart');
-    const likeCount = document.getElementById('likeCount');
+    const likeCount = document.getElementById('mylikeCount');
 
     const pageKey = 'my_portfolio_likes_2026';
 
