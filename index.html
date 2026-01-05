@@ -398,37 +398,32 @@
 				
 
 
-<!-- ================ 升级版点赞脚本：24小时限制一次净点赞 ================ -->
 <script>
 window.addEventListener('load', function() {
   setTimeout(function() {
     const likeButton = document.getElementById('likeButton');
     const heart = document.getElementById('heart');
     const likeCount = document.getElementById('myLikeCount');
-
-    if (!likeButton || !heart || !likeCount) {
-      console.error('点赞元素未找到');
-      return;
-    }
+    if (!likeButton || !heart || !likeCount) return;
 
     const pageKey = 'my_portfolio_likes_2026';
-    const lastLikeTimeKey = pageKey + '_lastTime';  // 上次“净增加”点赞的时间
+    const initialLikes = 142; // 真实初始全局点赞数（你手动设置）
 
-    // 从 localStorage 读取数据
-    let totalLikes = parseInt(localStorage.getItem(pageKey + '_total')) || 142;
-    let isCurrentlyLiked = localStorage.getItem(pageKey + '_liked') === 'true';
-    let lastLikeTimestamp = parseInt(localStorage.getItem(lastLikeTimeKey)) || 0;
+    // 从 localStorage 读取
+    let displayedLikes = parseInt(localStorage.getItem(pageKey + '_displayed')) || initialLikes;
+    let hasContributed = localStorage.getItem(pageKey + '_contributed') === 'true'; // 是否已贡献过+1
+    let lastContributeTime = parseInt(localStorage.getItem(pageKey + '_lastTime')) || 0;
+    let isTempLiked = localStorage.getItem(pageKey + '_tempLiked') === 'true'; // 当前视觉是否点红
 
-    const oneDayInMs = 24 * 60 * 60 * 1000;  // 24小时的毫秒数
+    const oneDayInMs = 24 * 60 * 60 * 1000;
     const now = Date.now();
 
-    // 判断是否已超过24小时（可以再次净增加点赞）
-    const canNewLike = (now - lastLikeTimestamp) >= oneDayInMs;
+    // 是否可以今天真正贡献+1
+    const canContributeToday = !hasContributed || (now - lastContributeTime) >= oneDayInMs;
 
     function updateDisplay() {
-      likeCount.textContent = totalLikes;
-
-      if (isCurrentlyLiked) {
+      likeCount.textContent = displayedLikes;
+      if (isTempLiked) {
         heart.textContent = '♥';
         heart.classList.add('liked');
       } else {
@@ -437,42 +432,44 @@ window.addEventListener('load', function() {
       }
     }
 
-    // 初始显示
     updateDisplay();
 
-    // 点击事件
     likeButton.onclick = function(e) {
       e.stopPropagation();
 
-      const wasLiked = isCurrentlyLiked;
+      // 如果当前是未点赞状态 → 尝试点赞
+      if (!isTempLiked) {
+        isTempLiked = true;
 
-      // 切换当前状态
-      isCurrentlyLiked = !isCurrentlyLiked;
-
-      // 如果从“未点”变成“已点”，且允许新点赞 → 总数+1 并记录时间
-      if (isCurrentlyLiked && !wasLiked) {
-        if (canNewLike || lastLikeTimestamp === 0) {  // 首次或已过24小时
-          totalLikes++;
-          localStorage.setItem(lastLikeTimeKey, now);  // 记录本次净增加时间
+        // 如果今天还能贡献真实点赞 → 总数+1
+        if (canContributeToday) {
+          displayedLikes++;
+          hasContributed = true;
+          localStorage.setItem(pageKey + '_lastTime', now);
+          localStorage.setItem(pageKey + '_contributed', 'true');
         }
-        // 如果还不到24小时，就不增加总数（但视觉上仍然变红，允许取消）
-      }
-      // 如果从“已点”变成“未点” → 总数-1
-      else if (!isCurrentlyLiked && wasLiked) {
-        totalLikes--;
-        // 注意：取消点赞不重置24小时计时，只有“净增加”时才更新时间
+        // 否则只是视觉点赞（临时，取消时会回滚）
+      } 
+      // 如果当前是已点赞状态 → 取消点赞
+      else {
+        isTempLiked = false;
+
+        // 只有是“今天刚贡献的临时点赞”才回滚数字，否则不减（防止减少真实总数）
+        if (canContributeToday && hasContributed && (now - lastContributeTime) < oneDayInMs) {
+          displayedLikes--; // 回滚今天的临时+1
+          // 不重置 hasContributed，因为今天已经用掉机会了
+        }
+        // 如果是昨天或更早贡献的，取消也不减（因为那已经是“永久”+1）
       }
 
       // 保存状态
-      localStorage.setItem(pageKey + '_total', totalLikes);
-      localStorage.setItem(pageKey + '_liked', isCurrentlyLiked);
+      localStorage.setItem(pageKey + '_displayed', displayedLikes);
+      localStorage.setItem(pageKey + '_tempLiked', isTempLiked);
 
-      // 更新显示
       updateDisplay();
     };
 
     likeButton.style.cursor = 'pointer';
-
   }, 1000);
 });
 </script>
