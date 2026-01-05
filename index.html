@@ -395,29 +395,39 @@
 
 
 				
-<!-- ================ 终极修复版点赞脚本（延迟执行，避免与不蒜子冲突） ================ -->
+
+
+<!-- ================ 升级版点赞脚本：24小时限制一次净点赞 ================ -->
 <script>
 window.addEventListener('load', function() {
-  // 等页面所有资源（包括不蒜子脚本）完全加载完毕后再执行
   setTimeout(function() {
     const likeButton = document.getElementById('likeButton');
     const heart = document.getElementById('heart');
     const likeCount = document.getElementById('myLikeCount');
 
-    // 如果元素没找到，报错提醒
     if (!likeButton || !heart || !likeCount) {
-      console.error('点赞元素未找到，请检查 ID 是否正确');
+      console.error('点赞元素未找到');
       return;
     }
 
     const pageKey = 'my_portfolio_likes_2026';
+    const lastLikeTimeKey = pageKey + '_lastTime';  // 上次“净增加”点赞的时间
 
+    // 从 localStorage 读取数据
     let totalLikes = parseInt(localStorage.getItem(pageKey + '_total')) || 142;
-    let isLiked = localStorage.getItem(pageKey + '_liked') === 'true';
+    let isCurrentlyLiked = localStorage.getItem(pageKey + '_liked') === 'true';
+    let lastLikeTimestamp = parseInt(localStorage.getItem(lastLikeTimeKey)) || 0;
+
+    const oneDayInMs = 24 * 60 * 60 * 1000;  // 24小时的毫秒数
+    const now = Date.now();
+
+    // 判断是否已超过24小时（可以再次净增加点赞）
+    const canNewLike = (now - lastLikeTimestamp) >= oneDayInMs;
 
     function updateDisplay() {
       likeCount.textContent = totalLikes;
-      if (isLiked) {
+
+      if (isCurrentlyLiked) {
         heart.textContent = '♥';
         heart.classList.add('liked');
       } else {
@@ -429,30 +439,42 @@ window.addEventListener('load', function() {
     // 初始显示
     updateDisplay();
 
-    // 绑定点击事件
+    // 点击事件
     likeButton.onclick = function(e) {
-      e.stopPropagation();  // 防止事件冒泡干扰
-      
-      if (isLiked) {
+      e.stopPropagation();
+
+      const wasLiked = isCurrentlyLiked;
+
+      // 切换当前状态
+      isCurrentlyLiked = !isCurrentlyLiked;
+
+      // 如果从“未点”变成“已点”，且允许新点赞 → 总数+1 并记录时间
+      if (isCurrentlyLiked && !wasLiked) {
+        if (canNewLike || lastLikeTimestamp === 0) {  // 首次或已过24小时
+          totalLikes++;
+          localStorage.setItem(lastLikeTimeKey, now);  // 记录本次净增加时间
+        }
+        // 如果还不到24小时，就不增加总数（但视觉上仍然变红，允许取消）
+      }
+      // 如果从“已点”变成“未点” → 总数-1
+      else if (!isCurrentlyLiked && wasLiked) {
         totalLikes--;
-        isLiked = false;
-      } else {
-        totalLikes++;
-        isLiked = true;
+        // 注意：取消点赞不重置24小时计时，只有“净增加”时才更新时间
       }
 
+      // 保存状态
       localStorage.setItem(pageKey + '_total', totalLikes);
-      localStorage.setItem(pageKey + '_liked', isLiked);
+      localStorage.setItem(pageKey + '_liked', isCurrentlyLiked);
+
+      // 更新显示
       updateDisplay();
     };
 
-    // 额外保险：给按钮加个明显的指针样式
     likeButton.style.cursor = 'pointer';
 
-  }, 1000);  // 延迟1秒执行，确保不蒜子完全跑完
+  }, 1000);
 });
 </script>
-
 
 
 
