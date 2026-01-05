@@ -20,67 +20,6 @@
 
 
 
-  <style>
-    /* ================ 点赞功能专属样式 ================ */
-.like-sidebar {
-  text-align: center;
-  margin: 40px 0 0 0;            /* 上间距40px，左右边距0（靠左） */
-  padding: 20px 18px;           /* 内边距调整，更紧凑 */
-  width: 80%;                  /* 关键：宽度占满 col-md-4（和照片一样） */
-  max-width: 100%;              /* 防止溢出 */
-  background: linear-gradient(135deg, #f0f2f5 0%, #e0e6ed 100%);
-  border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-}
-    .like-tip {
-      margin-bottom: 18px;
-      color: #555;
-      font-size: 15px;
-      line-height: 1.6;
-      font-weight: 500;
-    }
-    .like-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 28px;
-      background: #ffffff;
-      border-radius: 50px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.4s ease;
-    }
-    .like-btn:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-    }
-    .heart {
-      font-size: 34px;
-      color: #ccc;
-      transition: all 0.4s ease;
-    }
-    .heart.liked {
-      color: #e74c3c;
-      animation: pulse 0.6s ease;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.4); }
-      100% { transform: scale(1); }
-    }
-    .count {
-      font-size: 24px;
-      font-weight: bold;
-      color: #2c3e50;
-    }
-    /* ================ 样式结束 ================ */
-  </style>
-
-
-
-
-
 	
 
 </head>
@@ -345,18 +284,6 @@
 
 
 			  
-<!-- ================ 点赞功能开始 ================ -->
-<div class="like-sidebar">
-  <p class="like-tip">Click the heart to like it! ❤️</p>
-  <div class="like-btn" id="likeButton">
-    <span class="heart" id="heart">♡</span>
-    <span class="count" id="myLikeCount">142</span>
-  </div>
-</div>
-<!-- ================ 点赞功能结束 ================ -->
-
-
-			  
 			  
 	      </div>		
 
@@ -395,99 +322,7 @@
 
 
 
-				
 
-
-<script>
-window.addEventListener('load', function() {
-  setTimeout(function() {
-    const likeButton = document.getElementById('likeButton');
-    const heart = document.getElementById('heart');
-    const likeCount = document.getElementById('myLikeCount');
-    if (!likeButton || !heart || !likeCount) {
-      console.error('点赞元素未找到');
-      return;
-    }
-
-    const pageKey = 'my_portfolio_likes_2026';
-    const initialLikes = 142; // 你的初始点赞数
-
-    // 读取状态
-    let displayedLikes = parseInt(localStorage.getItem(pageKey + '_count')) || initialLikes;
-    
-    // 上次真正+1的时间（用于判断今天是否已加过）
-    let lastAddTime = parseInt(localStorage.getItem(pageKey + '_lastAdd')) || 0;
-    
-    // 当前是否为红心状态
-    let isCurrentlyLiked = localStorage.getItem(pageKey + '_status') === 'true';
-    
-    // 今天是否已经真正贡献过+1（并且尚未回滚）
-    let hasAddedTodayAndNotRolledBack = localStorage.getItem(pageKey + '_hasAddedToday') === 'true';
-
-    const oneDayInMs = 24 * 60 * 60 * 1000;
-    const now = Date.now();
-
-    // 重新计算：如果上次+1已超过24小时，则重置今天状态
-    if (lastAddTime > 0 && (now - lastAddTime) >= oneDayInMs) {
-      hasAddedTodayAndNotRolledBack = false;
-    }
-
-    // 更新显示
-    function updateDisplay() {
-      likeCount.textContent = displayedLikes;
-      if (isCurrentlyLiked) {
-        heart.textContent = '♥';
-        heart.classList.add('liked');
-      } else {
-        heart.textContent = '♡';
-        heart.classList.remove('liked');
-      }
-    }
-    updateDisplay();
-
-    // 点击事件
-    likeButton.onclick = function(e) {
-      e.stopPropagation();
-
-      if (!isCurrentlyLiked) {
-        // ========= 正在点赞（♡ → ♥）=========
-        isCurrentlyLiked = true;
-
-        // 只有今天还没真正加过，才+1 并标记
-        if (!hasAddedTodayAndNotRolledBack) {
-          displayedLikes++;
-          lastAddTime = now;
-          hasAddedTodayAndNotRolledBack = true;
-          localStorage.setItem(pageKey + '_lastAdd', now);
-          localStorage.setItem(pageKey + '_hasAddedToday', 'true');
-        }
-        // 否则只是变红心，不加数字
-
-      } else {
-        // ========= 正在取消点赞（♥ → ♡）=========
-        isCurrentlyLiked = false;
-
-        // 只有今天真正加过且尚未回滚过，才允许回滚-1
-        if (hasAddedTodayAndNotRolledBack) {
-          displayedLikes--;
-          hasAddedTodayAndNotRolledBack = false; // 回滚后标记为已回滚，今天不能再减
-          // 注意：不清除 lastAddTime，防止今天再加
-        }
-        // 其他情况一律不减（包括反复取消）
-      }
-
-      // 保存状态
-      localStorage.setItem(pageKey + '_count', displayedLikes);
-      localStorage.setItem(pageKey + '_status', isCurrentlyLiked);
-      localStorage.setItem(pageKey + '_hasAddedToday', hasAddedTodayAndNotRolledBack);
-
-      updateDisplay();
-    };
-
-    likeButton.style.cursor = 'pointer';
-  }, 1000);
-});
-</script>
 
 
 
