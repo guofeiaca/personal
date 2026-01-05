@@ -332,20 +332,24 @@
 		     
 	      <div style="font-family: 'times new roman', sans-serif; font-size: 12px;">
 	      <br><p>Jan. 1st, 2026</p> 
-		  <!-- 访客计数器 -->
-          <span id="busuanzi_container_site_pv">
-           Total Views: <span id="busuanzi_value_site_pv"></span> 
-          </span>
+
+
+			  
+<!-- 访客计数器 -->
+<span id="busuanzi_container_site_pv">
+  Total Views: <span id="busuanzi_value_site_pv"></span>
+</span>
+
 
 
 
 			  
 <!-- ================ 点赞功能开始 ================ -->
 <div class="like-sidebar">
-  <p class="like-tip">Click the heart to like it! ❤️ </p>
+  <p class="like-tip">Click the heart to like it! ❤️</p>
   <div class="like-btn" id="likeButton">
     <span class="heart" id="heart">♡</span>
-    <span class="count" id="myLikeCount">142</span>  <!-- 这里改了！ -->
+    <span class="count" id="myLikeCount">142</span>
   </div>
 </div>
 <!-- ================ 点赞功能结束 ================ -->
@@ -380,7 +384,7 @@
 
 
 				
-<!-- 不蒜子计数器脚本 -->
+<!-- 不蒜子计数器脚本（保持原样） -->
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
@@ -388,12 +392,23 @@
 
 
 
-  <script>
-  // ================ 点赞功能脚本（一定能点击） ================
-  document.addEventListener('DOMContentLoaded', function() {
+
+
+				
+<!-- ================ 终极修复版点赞脚本（延迟执行，避免与不蒜子冲突） ================ -->
+<script>
+window.addEventListener('load', function() {
+  // 等页面所有资源（包括不蒜子脚本）完全加载完毕后再执行
+  setTimeout(function() {
     const likeButton = document.getElementById('likeButton');
     const heart = document.getElementById('heart');
-    const likeCount = document.getElementById('mylikeCount');
+    const likeCount = document.getElementById('myLikeCount');
+
+    // 如果元素没找到，报错提醒
+    if (!likeButton || !heart || !likeCount) {
+      console.error('点赞元素未找到，请检查 ID 是否正确');
+      return;
+    }
 
     const pageKey = 'my_portfolio_likes_2026';
 
@@ -411,9 +426,13 @@
       }
     }
 
+    // 初始显示
     updateDisplay();
 
-    likeButton.addEventListener('click', function() {
+    // 绑定点击事件
+    likeButton.onclick = function(e) {
+      e.stopPropagation();  // 防止事件冒泡干扰
+      
       if (isLiked) {
         totalLikes--;
         isLiked = false;
@@ -421,12 +440,18 @@
         totalLikes++;
         isLiked = true;
       }
+
       localStorage.setItem(pageKey + '_total', totalLikes);
       localStorage.setItem(pageKey + '_liked', isLiked);
       updateDisplay();
-    });
-  });
-  </script>
+    };
+
+    // 额外保险：给按钮加个明显的指针样式
+    likeButton.style.cursor = 'pointer';
+
+  }, 1000);  // 延迟1秒执行，确保不蒜子完全跑完
+});
+</script>
 
 
 
